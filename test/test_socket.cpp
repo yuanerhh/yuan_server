@@ -10,7 +10,7 @@ int main(int argc, char const *argv[])
     try
     {
         /* code */
-        CTcpSocket objSocket("127.0.0.1", 12345, IPV6);
+        CTcpSocket objSocket();
     }
     catch(const CException& e)
     {

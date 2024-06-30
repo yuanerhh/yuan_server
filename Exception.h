@@ -47,12 +47,14 @@ namespace yuan {
     MAKE_EXCEPTION(CInvalidCall)
     MAKE_EXCEPTION(CInvalidAccess)
     MAKE_EXCEPTION(CNotSupport)
+    MAKE_EXCEPTION(CNetOptError)
 
     #define CUnexpectedThrow(info) throw CUnexpected(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
     #define CInvalidParamThrow(info) throw CInvalidParam(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
     #define CInvalidCallThrow(info) throw CInvalidCall(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
     #define CInvalidAccessThrow(info) throw CInvalidAccess(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
     #define CNotSupportThrow(info) throw CNotSupport(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
+    #define CNetOptErrorThrow(info) throw CNetOptError(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
 
 #undef MAKE_EXCEPTION
 

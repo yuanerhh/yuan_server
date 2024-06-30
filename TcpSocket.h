@@ -14,12 +14,14 @@ enum TCP_VERSION
 class CTcpSocket
 {
 public:
-    CTcpSocket(const std::string& strIp, int port, TCP_VERSION version = IPV4);
-    ~CTcpSocket() {}
-
+    CTcpSocket(TCP_VERSION version = IPV4);
+    ~CTcpSocket();
+    void Bind(const std::string& strIp, int port);
+    void Listen(int backlog = 0);
+    void Connect(const std::string& strIp, int port);
 
 private:
-    int m_socket = 0; 
+    int m_socket = -1; 
     std::string m_strIp = "";
     int m_port = 0;
     TCP_VERSION m_version = IPV4;
