@@ -10,7 +10,9 @@ int main(int argc, char const *argv[])
     try
     {
         /* code */
-        CTcpSocket objSocket();
+        CTcpSocket objSocket;
+        objSocket.Bind({"127.0.0.1", 12345});
+        objSocket.Listen();
     }
     catch(const CException& e)
     {
