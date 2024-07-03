@@ -2,9 +2,12 @@
 
 #include <string>
 #include <unistd.h>
+#include <cassert>
 #include "Exception.h"
 
 using namespace std;
+
+#define MAX_EVENTS_NUM 256
 
 namespace yuan {
 
@@ -26,7 +29,7 @@ CEpollEvent::~CEpollEvent()
     }
 }
 
-void CEpollEvent::AddEvent(const ISocket::ptr& pSocket, EVENT_TYPE emType)
+void CEpollEvent::UpdateEvent(const ISocket::ptr& pSocket, EVENT_TYPE emType, void* pEventData)
 {
     epoll_event ev;
     bzero(&ev, sizeof(ev));
@@ -40,10 +43,23 @@ void CEpollEvent::AddEvent(const ISocket::ptr& pSocket, EVENT_TYPE emType)
         ev.events |= EPOLLOUT;
     }
 
-    ev.data.fd = pSocket->GetFd();
-    if (-1 == epoll_ctl(m_fd, EPOLL_CTL_ADD, pSocket->GetFd(), &ev))
+    if (m_mapDataMgr.count(pSocket->GetFd() <= 0))
     {
-        CNetOptErrorThrow(string("epoll_ctl EPOLL_CTL_ADD failed, info: ") + strerror(errno));
+        m_mapDataMgr[pSocket->GetFd()] = {pSocket, pEventData};
+        ev.data.ptr = &m_mapDataMgr[pSocket->GetFd()];
+        if (-1 == epoll_ctl(m_fd, EPOLL_CTL_ADD, pSocket->GetFd(), &ev))
+        {
+            CNetOptErrorThrow(string("epoll_ctl EPOLL_CTL_ADD failed, info: ") + strerror(errno));
+        }
+    }
+    else
+    {
+        m_mapDataMgr[pSocket->GetFd()] = {pSocket, pEventData};
+        ev.data.ptr = &m_mapDataMgr[pSocket->GetFd()];
+        if (-1 == epoll_ctl(m_fd, EPOLL_CTL_MOD, pSocket->GetFd(), &ev))
+        {
+            CNetOptErrorThrow(string("epoll_ctl EPOLL_CTL_MOD failed, info: ") + strerror(errno));
+        }
     }
 }
 
@@ -53,27 +69,39 @@ void CEpollEvent::RemoveEvent(const ISocket::ptr& pSocket)
     {
         CNetOptErrorThrow(string("epoll_ctl EPOLL_CTL_DEL failed, info: ") + strerror(errno));
     }
+    m_mapDataMgr.erase(pSocket->GetFd());
 }
 
-void CEpollEvent::ModifyEvent(const ISocket::ptr& pSocket, EVENT_TYPE emType)
+std::vector<EVENT_DATA> CEpollEvent::WaitEvent(std::uint32_t ui32Timeout)
 {
-    epoll_event ev;
-    bzero(&ev, sizeof(ev));
-    if (emType & EVENT_IN == EVENT_IN)
+    epoll_event events[MAX_EVENTS_NUM];
+    auto ret = epoll_wait(m_fd, events, MAX_EVENTS_NUM, ui32Timeout);
+    if (ret < 0)
     {
-        ev.events |= EPOLLIN;
+        CNetOptErrorThrow(string("epoll_wait failed, info: ") + strerror(errno));
     }
 
-    if (emType & EVENT_OUT == EVENT_OUT)
+    std::vector<EVENT_DATA> vecEvent;
+    for (int i = 0; i < ret; ++i)
     {
-        ev.events |= EPOLLOUT;
+        EVENT_DATA data;
+        EPOLL_DATA* pEpollData = static_cast<EPOLL_DATA*>(events[i].data.ptr);
+        assert((pEpollData != nullptr));
+        if (events[i].events & EPOLLIN == EPOLLIN)
+        {
+            data.type |= EVENT_IN;
+        }
+
+        if (events[i].events & EPOLLOUT == EPOLLOUT)
+        {
+            data.type |= EVENT_OUT;
+        }
+        data.pSocket = pEpollData->pSocket;
+        data.pData = pEpollData->pData;
+        vecEvent.emplace_back(data);
     }
 
-    ev.data.fd = pSocket->GetFd();
-    if (-1 == epoll_ctl(m_fd, EPOLL_CTL_MOD, pSocket->GetFd(), &ev))
-    {
-        CNetOptErrorThrow(string("epoll_ctl EPOLL_CTL_MOD failed, info: ") + strerror(errno));
-    }
+    return vecEvent;
 }
 
 }
