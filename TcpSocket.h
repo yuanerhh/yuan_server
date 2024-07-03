@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <string>
 #include <memory>
+#include "ISocket.h"
 
 #define LISTEN_SIZE 125
 
@@ -14,7 +15,7 @@ struct NET_ADDR
     int port = 0;
 };
 
-class CTcpSocket
+class CTcpSocket : public ISocket
 {
 public:
     using ptr = std::shared_ptr<CTcpSocket>;
@@ -22,6 +23,7 @@ public:
     CTcpSocket();
     CTcpSocket(int socket);
     ~CTcpSocket();
+
     void Bind(const NET_ADDR& stAddr);
     void Listen(int backlog = LISTEN_SIZE);
     void Connect(const NET_ADDR& stAddr);
@@ -31,6 +33,10 @@ public:
     void SetReusePort(bool status);
     void SetNoDelay(bool status);
     void SetKeepalive(bool status);
+
+    virtual int GetFd() override;
+    virtual std::int32_t Send(const char* pBuf, size_t size) override;
+    virtual std::int32_t Recv(char* pBuf, size_t size) override;
 
 private:
     int m_socket = -1; 

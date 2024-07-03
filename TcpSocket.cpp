@@ -17,7 +17,7 @@ CTcpSocket::CTcpSocket()
     int nSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (-1 == nSocket)
     {
-        CUnexpectedThrow(string("Create socket failed, info: ") + strerror(errno));
+        CNetOptErrorThrow(string("Create socket failed, info: ") + strerror(errno));
     }
     m_socket = nSocket;
 }
@@ -140,5 +140,30 @@ void CTcpSocket::SetKeepalive(bool status)
     }
 }
 
+int CTcpSocket::GetFd()
+{
+    return m_socket;
+}
+
+std::int32_t CTcpSocket::Send(const char* pBuf, size_t size)
+{
+    auto nSize = send(m_socket, pBuf, size, 0);
+    if (nSize >= 0)
+    {
+        return nSize;
+    }
+    
+    return -errno;
+}
+std::int32_t CTcpSocket::Recv(char* pBuf, size_t size)
+{
+    auto nSize = recv(m_socket, pBuf, size, 0);
+    if (nSize >= 0)
+    {
+        return nSize;
+    }
+    
+    return -errno;
+}
 
 }
