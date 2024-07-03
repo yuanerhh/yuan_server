@@ -22,7 +22,7 @@ class CChannel
 public:
     CChannel(IEventPoller::ptr poller, ISocket::ptr pSocket);
     ~CChannel();
-    ISocket::ptr GetFd();
+    ISocket::ptr GetSocket();
     void SetReadCB(FuncEventCB func);
     void SetWriteCB(FuncEventCB func);
     void SetCloseCB(FuncEventCB func);
