@@ -11,6 +11,7 @@ enum _EVENT_TYPE
     EVENT_IN = 0x1, 
     EVENT_OUT = 0x2,
     EVENT_CLOSE = 0x4,
+    EVENT_EDGE_TRIGGER = 0x8,
 };
 
 using EVENT_TYPE = std::int32_t;

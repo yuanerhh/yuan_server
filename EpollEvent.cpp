@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <cassert>
 #include "Exception.h"
+#include "Log.h"
 
 using namespace std;
 
@@ -33,17 +34,20 @@ void CEpollEvent::UpdateEvent(const ISocket::ptr& pSocket, EVENT_TYPE emType, vo
 {
     epoll_event ev;
     bzero(&ev, sizeof(ev));
-    if (emType & EVENT_IN == EVENT_IN)
+    if ((emType & EVENT_IN) == EVENT_IN)
     {
         ev.events |= EPOLLIN;
     }
-
-    if (emType & EVENT_OUT == EVENT_OUT)
+    if ((emType & EVENT_OUT) == EVENT_OUT)
     {
         ev.events |= EPOLLOUT;
     }
+    if ((emType & EVENT_EDGE_TRIGGER) == EVENT_EDGE_TRIGGER)
+    {
+        ev.events |= EPOLLET;
+    }
 
-    if (m_mapDataMgr.count(pSocket->GetFd() <= 0))
+    if (m_mapDataMgr.count(pSocket->GetFd()) <= 0)
     {
         m_mapDataMgr[pSocket->GetFd()] = {pSocket, pEventData};
         ev.data.ptr = &m_mapDataMgr[pSocket->GetFd()];
@@ -87,22 +91,22 @@ std::vector<EVENT_OBJ> CEpollEvent::WaitEvent(std::uint32_t ui32Timeout)
         EVENT_OBJ data;
         EPOLL_DATA* pEpollData = static_cast<EPOLL_DATA*>(events[i].data.ptr);
         assert((pEpollData != nullptr));
-        if (events[i].events & EPOLLIN == EPOLLIN)
+        if ((events[i].events & EPOLLIN) == EPOLLIN)
         {
             data.stData.type |= EVENT_IN;
         }
 
-        if (events[i].events & EPOLLPRI == EPOLLPRI)
+        if ((events[i].events & EPOLLPRI) == EPOLLPRI)
         {
             data.stData.type |= EVENT_IN;
         }
 
-        if (events[i].events & EPOLLOUT == EPOLLOUT)
+        if ((events[i].events & EPOLLOUT) == EPOLLOUT)
         {
             data.stData.type |= EVENT_OUT;
         }
 
-        if (events[i].events & EPOLLRDHUP == EPOLLRDHUP)
+        if ((events[i].events & EPOLLRDHUP) == EPOLLRDHUP)
         {
             data.stData.type |= EVENT_CLOSE;
         }

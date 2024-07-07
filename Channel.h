@@ -34,7 +34,8 @@ public:
     void SetReadStatus(bool bStatus);
     void SetWriteStatus(bool bStatus);
     void SetCloseStatus(bool bStatus);
-    void HandleEvent(EVENT_DATA stData);
+    void SetEdgeTrigger(bool bStatus);
+    void HandleEvent(const EVENT_DATA& stData);
 
 private:
     CEventLoop* m_pEventLoop;

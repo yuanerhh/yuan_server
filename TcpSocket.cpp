@@ -110,6 +110,15 @@ void CTcpSocket::SetNoBlock(bool status)
         CNetOptErrorThrow(string("F_GETFL failed, info: ") + strerror(errno));
     }
 
+    if (status)
+    {
+        flags |= SOCK_NONBLOCK;
+    }
+    else
+    {
+        flags &= (~SOCK_NONBLOCK);
+    }
+
     if (-1 == fcntl(m_socket, F_SETFL, flags | SOCK_NONBLOCK))
     {
         CNetOptErrorThrow(string("F_SETFL noblock failed, info: ") + strerror(errno));
@@ -118,7 +127,17 @@ void CTcpSocket::SetNoBlock(bool status)
 
 void CTcpSocket::SetReuseAddr(bool status)
 {
-    if (-1 == setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, &status, sizeof(status)))
+    int nStatus = 0;
+    if (status)
+    {
+        nStatus = 1;
+    }
+    else
+    {
+        nStatus = 0;
+    }
+
+    if (-1 == setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, &nStatus, sizeof(nStatus)))
     {
         CNetOptErrorThrow(string("Set reuse addr failed, info: ") + strerror(errno));
     }
@@ -126,7 +145,17 @@ void CTcpSocket::SetReuseAddr(bool status)
 
 void CTcpSocket::SetReusePort(bool status)
 {
-    if (-1 == setsockopt(m_socket, SOL_SOCKET, SO_REUSEPORT, &status, sizeof(status)))
+    int nStatus = 0;
+    if (status)
+    {
+        nStatus = 1;
+    }
+    else
+    {
+        nStatus = 0;
+    }
+
+    if (-1 == setsockopt(m_socket, SOL_SOCKET, SO_REUSEPORT, &nStatus, sizeof(nStatus)))
     {
         CNetOptErrorThrow(string("Set reuse port failed, info: ") + strerror(errno));
     }
@@ -134,7 +163,17 @@ void CTcpSocket::SetReusePort(bool status)
 
 void CTcpSocket::SetNoDelay(bool status)
 {
-    if (-1 == setsockopt(m_socket, SOL_SOCKET, TCP_NODELAY, &status, sizeof(status)))
+    int nStatus = 0;
+    if (status)
+    {
+        nStatus = 1;
+    }
+    else
+    {
+        nStatus = 0;
+    }
+
+    if (-1 == setsockopt(m_socket, SOL_SOCKET, TCP_NODELAY, &nStatus, sizeof(nStatus)))
     {
         CNetOptErrorThrow(string("Set tcp nodelay failed, info: ") + strerror(errno));
     }
@@ -142,7 +181,17 @@ void CTcpSocket::SetNoDelay(bool status)
 
 void CTcpSocket::SetKeepalive(bool status)
 {
-    if (-1 == setsockopt(m_socket, SOL_SOCKET, SO_KEEPALIVE, &status, sizeof(status)))
+    int nStatus = 0;
+    if (status)
+    {
+        nStatus = 1;
+    }
+    else
+    {
+        nStatus = 0;
+    }
+    
+    if (-1 == setsockopt(m_socket, SOL_SOCKET, SO_KEEPALIVE, &nStatus, sizeof(nStatus)))
     {
         CNetOptErrorThrow(string("Set keepalive failed, info: ") + strerror(errno));
     }
@@ -160,6 +209,11 @@ void CTcpSocket::Close()
 int CTcpSocket::GetFd()
 {
     return m_socket;
+}
+
+CNetAddr CTcpSocket::GetAddr()
+{
+    return m_stBindAddr;
 }
 
 std::int32_t CTcpSocket::Send(const char* pBuf, size_t size)

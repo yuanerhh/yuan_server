@@ -19,6 +19,9 @@ public:
     void Start();
 
 private:
+    CChannel::ptr __GetChBySocket(ISocket::ptr pSocket);
+
+private:
     std::set<CChannel::ptr> m_channelMgr;
     IEventPoller::ptr m_poller;
 };

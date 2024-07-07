@@ -3,7 +3,7 @@
 --     set_kind("binary")
 --     add_files("../TcpSocket.cpp", "test_socket.cpp")
 
-target("server")
+target("echo_server")
     set_targetdir("./bin")
     add_cxflags("-g -ggdb -DDEBUG")
     add_includedirs("../")

@@ -19,6 +19,7 @@ public:
 
     virtual void Close() override;
     virtual int GetFd() override;
+    virtual CNetAddr GetAddr() override;
 
     virtual void Bind(const CNetAddr& stAddr) override;
     virtual void Listen(int backlog = LISTEN_SIZE) override;
@@ -35,8 +36,8 @@ public:
 
 private:
     int m_socket = -1; 
-    std::string m_strIp = "";
-    int m_port = 0;
+    // std::string m_strIp = "";
+    // int m_port = 0;
     CNetAddr m_stBindAddr;
     CNetAddr m_stConnectAddr;
 };

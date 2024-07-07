@@ -18,6 +18,7 @@ public:
     virtual ~ISocket() {}
     virtual void Close() = 0;
     virtual int GetFd() = 0;
+    virtual CNetAddr GetAddr() = 0;
 
     virtual void Bind(const CNetAddr& stAddr) = 0;
     virtual void Listen(int backlog = LISTEN_SIZE) = 0;

@@ -69,7 +69,20 @@ void CChannel::SetCloseStatus(bool bStatus)
 
 }
 
-void CChannel::HandleEvent(EVENT_DATA stData)
+void CChannel::SetEdgeTrigger(bool bStatus)
+{
+    if (bStatus)
+    {
+        m_eventType |= EVENT_EDGE_TRIGGER;
+    }
+    else
+    {
+        m_eventType &= (~EVENT_EDGE_TRIGGER);
+    }
+    m_poller->UpdateEvent(m_pSocket, m_eventType, nullptr);
+}
+
+void CChannel::HandleEvent(const EVENT_DATA& stData)
 {
     if (stData.type & EVENT_CLOSE)
     {
@@ -85,11 +98,15 @@ void CChannel::HandleEvent(EVENT_DATA stData)
             auto pClientSock = m_pSocket->Accept();
             auto pClientCh = make_shared<CChannel>(m_pEventLoop, pClientSock, false);
             pClientCh->SetReadStatus(true);
+            pClientCh->SetEdgeTrigger(true);
             m_pEventLoop->AddChannel(pClientCh);
+
+            myLog << "accept new client ip: " << pClientSock->GetAddr().strIp 
+                << ", port: " << pClientSock->GetAddr().port;
         }
         else
         {
-            
+            myLog << "client event in" << endl;
         }
     }
 

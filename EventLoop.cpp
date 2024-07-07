@@ -28,7 +28,31 @@ void CEventLoop::RemoveChannel(CChannel::ptr pChannel)
 
 void CEventLoop::Start()
 {
+    while (true)
+    {
+        auto evObjs = m_poller->WaitEvent(1000);
+        for (const auto& evObj: evObjs)
+        {
+            auto ch = __GetChBySocket(evObj.pSocket);
+            if (nullptr != ch)
+            {
+                ch->HandleEvent(evObj.stData);
+            }
+        }
+    }
+}
 
+CChannel::ptr CEventLoop::__GetChBySocket(ISocket::ptr pSocket)
+{
+    for (const auto& ch : m_channelMgr)
+    {
+        if (ch->GetSocket() == pSocket)
+        {
+            return ch;
+        }
+    }
+
+    return nullptr;
 }
 
 }
