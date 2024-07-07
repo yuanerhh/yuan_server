@@ -18,10 +18,10 @@ class CEpollEvent : public IEventPoller
 
 public:
     CEpollEvent();
-    ~CEpollEvent(){}
+    ~CEpollEvent();
     virtual void UpdateEvent(const ISocket::ptr& pSocket, EVENT_TYPE emType, void* pEventData);
     virtual void RemoveEvent(const ISocket::ptr& pSocket);
-    virtual std::vector<EVENT_DATA> WaitEvent(std::uint32_t ui32Timeout);
+    virtual std::vector<EVENT_OBJ> WaitEvent(std::uint32_t ui32Timeout);
 
 private:
     int m_fd = -1;

@@ -72,7 +72,7 @@ void CEpollEvent::RemoveEvent(const ISocket::ptr& pSocket)
     m_mapDataMgr.erase(pSocket->GetFd());
 }
 
-std::vector<EVENT_DATA> CEpollEvent::WaitEvent(std::uint32_t ui32Timeout)
+std::vector<EVENT_OBJ> CEpollEvent::WaitEvent(std::uint32_t ui32Timeout)
 {
     epoll_event events[MAX_EVENTS_NUM];
     auto ret = epoll_wait(m_fd, events, MAX_EVENTS_NUM, ui32Timeout);
@@ -81,23 +81,34 @@ std::vector<EVENT_DATA> CEpollEvent::WaitEvent(std::uint32_t ui32Timeout)
         CNetOptErrorThrow(string("epoll_wait failed, info: ") + strerror(errno));
     }
 
-    std::vector<EVENT_DATA> vecEvent;
+    std::vector<EVENT_OBJ> vecEvent;
     for (int i = 0; i < ret; ++i)
     {
-        EVENT_DATA data;
+        EVENT_OBJ data;
         EPOLL_DATA* pEpollData = static_cast<EPOLL_DATA*>(events[i].data.ptr);
         assert((pEpollData != nullptr));
         if (events[i].events & EPOLLIN == EPOLLIN)
         {
-            data.type |= EVENT_IN;
+            data.stData.type |= EVENT_IN;
+        }
+
+        if (events[i].events & EPOLLPRI == EPOLLPRI)
+        {
+            data.stData.type |= EVENT_IN;
         }
 
         if (events[i].events & EPOLLOUT == EPOLLOUT)
         {
-            data.type |= EVENT_OUT;
+            data.stData.type |= EVENT_OUT;
         }
+
+        if (events[i].events & EPOLLRDHUP == EPOLLRDHUP)
+        {
+            data.stData.type |= EVENT_CLOSE;
+        }
+
         data.pSocket = pEpollData->pSocket;
-        data.pData = pEpollData->pData;
+        data.stData.pUserData = pEpollData->pData;
         vecEvent.emplace_back(data);
     }
 

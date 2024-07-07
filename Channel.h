@@ -15,12 +15,17 @@
 
 namespace yuan {
 
+class CEventLoop;
+
 using FuncEventCB = std::function<void(void)>;
 
-class CChannel
+class CChannel : public std::enable_shared_from_this<CChannel>
 {
 public:
-    CChannel(IEventPoller::ptr poller, ISocket::ptr pSocket);
+    using ptr = std::shared_ptr<CChannel>;
+
+public:
+    CChannel(CEventLoop* pEventLoop, ISocket::ptr pSocket, bool bIsListen);
     ~CChannel();
     ISocket::ptr GetSocket();
     void SetReadCB(FuncEventCB func);
@@ -29,14 +34,17 @@ public:
     void SetReadStatus(bool bStatus);
     void SetWriteStatus(bool bStatus);
     void SetCloseStatus(bool bStatus);
+    void HandleEvent(EVENT_DATA stData);
 
 private:
-    IEventPoller::ptr m_poller;
+    CEventLoop* m_pEventLoop;
+    IEventPoller* m_poller;
     ISocket::ptr m_pSocket;
     FuncEventCB m_funReadCB; 
     FuncEventCB m_funWriteCB;
     FuncEventCB m_funCloseCB;
     EVENT_TYPE m_eventType;
+    bool m_bIsListen;
 };
 
 

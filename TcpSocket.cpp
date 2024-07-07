@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "Exception.h"
+#include "Log.h"
 
 using namespace std;
 
@@ -28,14 +29,17 @@ CTcpSocket::CTcpSocket(int socket)
 
 CTcpSocket::~CTcpSocket()
 {
-    if (-1 != m_socket)
+    try
     {
-        close(m_socket);
-        m_socket = -1;
+        Close();
+    }
+    catch(const CException& e)
+    {
+        myLog << e.what() << std::endl;
     }
 }
 
-void CTcpSocket::Bind(const NET_ADDR& stAddr)
+void CTcpSocket::Bind(const CNetAddr& stAddr)
 {
     sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
@@ -58,7 +62,7 @@ void CTcpSocket::Listen(int backlog)
     }
 }
 
-void CTcpSocket::Connect(const NET_ADDR& stAddr)
+void CTcpSocket::Connect(const CNetAddr& stAddr)
 {
     sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
@@ -73,17 +77,19 @@ void CTcpSocket::Connect(const NET_ADDR& stAddr)
     m_stConnectAddr = stAddr;
 }
 
-CTcpSocket::ptr CTcpSocket::Accept()
+ISocket::ptr CTcpSocket::Accept()
 {
     sockaddr_in addr;
     socklen_t addrLen;
     memset(&addr, 0, sizeof(addr));
-    if (-1 == accept4(m_socket, (sockaddr *)&addr, &addrLen, SOCK_NONBLOCK))
+
+    auto ret = accept4(m_socket, (sockaddr *)&addr, &addrLen, SOCK_NONBLOCK);
+    if (-1 == ret)
     {
         CNetOptErrorThrow(string("Accept4 failed, info: ") + strerror(errno));
     }
 
-    CTcpSocket::ptr pAccept = make_shared<CTcpSocket>();
+    CTcpSocket::ptr pAccept = make_shared<CTcpSocket>(ret);
     char buf[50] = {0};
     if (inet_ntop(AF_INET, &(addr.sin_addr), buf, sizeof(buf)) == NULL) 
     {
@@ -92,6 +98,8 @@ CTcpSocket::ptr CTcpSocket::Accept()
 
     pAccept->m_stBindAddr.strIp = buf;
     pAccept->m_stBindAddr.port = ntohs(addr.sin_port);
+
+    return pAccept;
 }
 
 void CTcpSocket::SetNoBlock(bool status)
@@ -137,6 +145,15 @@ void CTcpSocket::SetKeepalive(bool status)
     if (-1 == setsockopt(m_socket, SOL_SOCKET, SO_KEEPALIVE, &status, sizeof(status)))
     {
         CNetOptErrorThrow(string("Set keepalive failed, info: ") + strerror(errno));
+    }
+}
+
+void CTcpSocket::Close()
+{
+    if (-1 != m_socket)
+    {
+        close(m_socket);
+        m_socket = -1;
     }
 }
 
