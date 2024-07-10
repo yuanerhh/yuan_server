@@ -21,11 +21,11 @@ int main(int argc, char const *argv[])
     try
     {
         ISocket::ptr pSocket = make_shared<CTcpSocket>();
-        pSocket->Bind({strIp, 12345});
-        pSocket->Listen();
         pSocket->SetNoBlock(true);
         pSocket->SetReuseAddr(true);
         pSocket->SetReusePort(true);
+        pSocket->Bind({strIp, 12345});
+        pSocket->Listen();
         CEventLoop loop;
         CChannel::ptr pChannel = make_shared<CChannel>(&loop, pSocket, true);
         pChannel->SetReadStatus(true);
