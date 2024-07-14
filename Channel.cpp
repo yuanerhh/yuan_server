@@ -19,6 +19,10 @@ CChannel::CChannel(CEventLoop* pEventLoop, ISocket::ptr pSocket, bool bIsListen)
 CChannel::~CChannel()
 {
     // myLog << "CChannel ptr" << hex << (void *)this << dec << ", socket ref: " << m_pSocket.use_count() << endl;
+
+    //销毁channel前，需要清除socket绑定的事件以及socket的智能指针引用
+    //m_pSocket的生命周期应与其绑定的CChannel对象一致
+    m_poller->RemoveEvent(m_pSocket);
 }
 
 ISocket::ptr CChannel::GetSocket()
@@ -140,8 +144,7 @@ void CChannel::HandleEvent(const EVENT_DATA& stData)
                     {
                         m_funCloseCB();
                     }
-                    //销毁channel前，需要清除socket绑定的事件
-                    m_poller->RemoveEvent(m_pSocket);
+                    
                     m_pEventLoop->RemoveChannel(shared_from_this());
                     break;
                 }

@@ -37,9 +37,9 @@ namespace yuan {
     class ExceptName : public CException \
     { \
     public: \
-        ExceptName(const std::string& file, const std::string& line, \ 
-                    const std::string& func, const std::string& errInfo) : \ 
-                     CException(file, line, func, errInfo) {} \
+        ExceptName(const std::string& file, const std::string& line, \
+        const std::string& func, const std::string& errInfo) : \
+        CException(file, line, func, errInfo) {} \
     };
 
     MAKE_EXCEPTION(CUnexpected)
