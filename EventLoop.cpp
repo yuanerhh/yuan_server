@@ -26,6 +26,11 @@ void CEventLoop::RemoveChannel(CChannel::ptr pChannel)
     m_channelMgr.erase(pChannel);
 }
 
+size_t CEventLoop::GetChannelSize()
+{
+    return m_channelMgr.size();
+}
+
 void CEventLoop::Start()
 {
     while (true)

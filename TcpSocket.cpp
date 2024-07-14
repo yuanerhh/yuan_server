@@ -86,7 +86,8 @@ ISocket::ptr CTcpSocket::Accept()
     auto ret = accept4(m_socket, (sockaddr *)&addr, &addrLen, SOCK_NONBLOCK);
     if (-1 == ret)
     {
-        CNetOptErrorThrow(string("Accept4 failed, info: ") + strerror(errno));
+        CNetOptErrorThrow(string("Accept4 failed, errno: ") + to_string(errno) 
+            + ", errinfo: " + strerror(errno));
     }
 
     CTcpSocket::ptr pAccept = make_shared<CTcpSocket>(ret);

@@ -3,6 +3,7 @@
 #include "EventLoop.h"
 #include "TcpSocket.h"
 #include "Exception.h"
+#include "Log.h"
 
 using namespace std;
 using namespace yuan;

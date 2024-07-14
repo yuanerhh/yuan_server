@@ -16,6 +16,7 @@ public:
     IEventPoller::ptr GetEventPoller();
     void AddChannel(CChannel::ptr pChannel);
     void RemoveChannel(CChannel::ptr pChannel);
+    size_t GetChannelSize();
     void Start();
 
 private:
