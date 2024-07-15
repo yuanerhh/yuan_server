@@ -13,4 +13,7 @@ target("echo_server")
     "../Channel.cpp", 
     "../EventLoop.cpp", 
     "../TcpSocket.cpp",
-    "../EpollEvent.cpp")
+    "../EpollEvent.cpp",
+    "../Acceptor.cpp",
+    "../Connector.cpp",
+    "../TcpServer.cpp")

@@ -1,12 +1,14 @@
 #include <iostream>
-#include "Channel.h"
-#include "EventLoop.h"
-#include "TcpSocket.h"
+#include "TcpServer.h"
 #include "Exception.h"
-#include "Log.h"
 
 using namespace std;
 using namespace yuan;
+
+void ReadMsgCB(ISocket::ptr pSocket, char* pBuf, size_t size)
+{
+    pSocket->Send(pBuf, size);
+}
 
 int main(int argc, char const *argv[])
 {
@@ -21,18 +23,9 @@ int main(int argc, char const *argv[])
 
     try
     {
-        ISocket::ptr pSocket = make_shared<CTcpSocket>();
-        pSocket->SetNoBlock(true);
-        pSocket->SetReuseAddr(true);
-        pSocket->SetReusePort(true);
-        pSocket->Bind({strIp, 12345});
-        pSocket->Listen();
-        CEventLoop loop;
-        CChannel::ptr pChannel = make_shared<CChannel>(&loop, pSocket, true);
-        pChannel->SetReadStatus(true);
-        pChannel->SetEdgeTrigger(true);
-        loop.AddChannel(pChannel);
-        loop.Start();
+        CTcpServer server(strIp, port);
+        server.SetReadMsgCB(&ReadMsgCB);
+        server.Start();
     }
     catch(const CException& e)
     {

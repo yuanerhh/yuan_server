@@ -91,66 +91,12 @@ void CChannel::SetEdgeTrigger(bool bStatus)
 
 void CChannel::HandleEvent(const EVENT_DATA& stData)
 {
-    const int nBufSize = 1024;
-    char buf[nBufSize] = {0};
-    // if (stData.type & EVENT_CLOSE)
-    // {
-    //     myLog << "client: " << m_pSocket->GetFd() << " disconnect!" << endl;
-    //     if (m_funCloseCB)
-    //     {
-    //         m_funCloseCB();
-    //     }
-    //     m_pEventLoop->RemoveChannel(shared_from_this());
-    //     myLog << "GetChannelSize: " << m_pEventLoop->GetChannelSize() << endl;
-    // }
-
+    
     if (stData.type & EVENT_IN)
     {
-        if (m_bIsListen)
+        if (m_funReadCB)
         {
-            try
-            {
-                //TODO: 当前Accept可能会出现Invalid Param错误，暂不知原因，所以添加try catch处理
-                auto pClientSock = m_pSocket->Accept();
-                auto pClientCh = make_shared<CChannel>(m_pEventLoop, pClientSock, false);
-                pClientCh->SetReadStatus(true);
-                pClientCh->SetEdgeTrigger(true);
-                m_pEventLoop->AddChannel(pClientCh);
-
-                myLog << "accept new client ip: " << pClientSock->GetAddr().strIp 
-                    << ", port: " << pClientSock->GetAddr().port << endl;
-            }
-            catch(const CException& e)
-            {
-                myLog << e.what() << '\n';
-            }
-        }
-        else
-        {
-            // myLog << "client event in" << endl;
-            while (true)
-            {
-                bzero(buf, nBufSize);
-                auto nRecvSize = m_pSocket->Recv(buf, nBufSize);
-                if (nRecvSize < 0)
-                {
-                    break;
-                }
-                //client 套接字关闭
-                else if (nRecvSize == 0)
-                {
-                    myLog << "client: " << m_pSocket->GetFd() << " disconnect!" << endl;
-                    if (m_funCloseCB)
-                    {
-                        m_funCloseCB();
-                    }
-                    
-                    m_pEventLoop->RemoveChannel(shared_from_this());
-                    break;
-                }
-
-                m_pSocket->Send(buf, nRecvSize);
-            }
+            m_funReadCB();
         }
     }
 

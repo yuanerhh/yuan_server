@@ -16,19 +16,19 @@ IEventPoller::ptr CEventLoop::GetEventPoller()
     return m_poller;
 }
 
-void CEventLoop::AddChannel(CChannel::ptr pChannel)
+void CEventLoop::AddChannel(CConnector::ptr pConnector)
 {
-    m_channelMgr.insert(pChannel);
+    m_connectorMgr.insert(pConnector);
 }
 
-void CEventLoop::RemoveChannel(CChannel::ptr pChannel)
+void CEventLoop::RemoveChannel(CConnector::ptr pConnector)
 {
-    m_channelMgr.erase(pChannel);
+    m_connectorMgr.erase(pConnector);
 }
 
-size_t CEventLoop::GetChannelSize()
+size_t CEventLoop::GetConnectSize()
 {
-    return m_channelMgr.size();
+    return m_connectorMgr.size();
 }
 
 void CEventLoop::Start()
@@ -49,11 +49,11 @@ void CEventLoop::Start()
 
 CChannel::ptr CEventLoop::__GetChBySocket(ISocket::ptr pSocket)
 {
-    for (const auto& ch : m_channelMgr)
+    for (const auto& item : m_connectorMgr)
     {
-        if (ch->GetSocket() == pSocket)
+        if (item->GetSocket() == pSocket)
         {
-            return ch;
+            return item->GetChannel();
         }
     }
 

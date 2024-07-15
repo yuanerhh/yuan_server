@@ -19,7 +19,7 @@ class CEventLoop;
 
 using FuncEventCB = std::function<void(void)>;
 
-class CChannel : public std::enable_shared_from_this<CChannel>
+class CChannel
 {
 public:
     using ptr = std::shared_ptr<CChannel>;
