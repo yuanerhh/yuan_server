@@ -9,6 +9,7 @@ CTcpServer::CTcpServer(const std::string& strIp, std::int32_t nPort)
     , m_pAccceptor(nullptr)
 {
     m_pAccceptor.reset(new CAcceptor(m_pLoop.get(), strIp, nPort));
+    m_pAccceptor->SetConnectCB(std::bind(&CTcpServer::OnConnection, this, placeholders::_1));
 }
 
 CTcpServer::~CTcpServer()
