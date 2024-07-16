@@ -1,5 +1,7 @@
 #include "TcpServer.h"
 
+#include "Log.h"
+
 using namespace std;
 
 namespace yuan {
@@ -17,6 +19,7 @@ CTcpServer::~CTcpServer()
 
 void CTcpServer::OnConnection(ISocket::ptr pSocket)
 {
+    myLog;
     auto pConnector = make_shared<CConnector>(m_pLoop.get(), pSocket);
     pConnector->SetCloseCB(std::bind(&CTcpServer::OnClose, this, placeholders::_1));
     pConnector->SetReadMsgCB(m_cbReadMsg);

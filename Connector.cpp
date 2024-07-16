@@ -13,24 +13,21 @@ CConnector::CConnector(CEventLoop* pEventLoop, ISocket::ptr pSocket)
     : m_pEventLoop(pEventLoop)
     , m_pSocket(pSocket)
 {
-    auto pClientCh = make_shared<CChannel>(pEventLoop, pSocket, false);
-    pClientCh->SetReadStatus(true);
-    pClientCh->SetEdgeTrigger(true);
+    m_pChannel = make_shared<CChannel>(pEventLoop, pSocket, false);
+    m_pChannel->SetReadStatus(true);
+    m_pChannel->SetEdgeTrigger(true);
+    m_pChannel->SetReadCB(std::bind(&CConnector::OnReadMsg, this));
+    m_pEventLoop->AddChannel(m_pChannel);
 }
 
 CConnector::~CConnector()
 {
-
+    m_pEventLoop->RemoveChannel(m_pChannel);
 }
 
 ISocket::ptr CConnector::GetSocket()
 {
     return m_pSocket;
-}
-
-CChannel::ptr CConnector::GetChannel()
-{
-    return m_pChannel;
 }
 
 void CConnector::OnReadMsg()

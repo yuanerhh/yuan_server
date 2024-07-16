@@ -18,7 +18,6 @@ public:
     ~CConnector();
 
     ISocket::ptr GetSocket();
-    CChannel::ptr GetChannel();
     void OnReadMsg();
     void SetReadMsgCB(ReadMsgCB funcCB);
     void SetCloseCB(CloseCB funcCB);
