@@ -35,7 +35,6 @@ void CAcceptor::OnConnection()
 {
     try
     {
-        //TODO: 当前Accept可能会出现Invalid Param错误，暂不知原因，所以添加try catch处理
         auto pClientSock = m_pSocket->Accept();
         m_cbConnect(pClientSock);
         myLog << "accept new client ip: " << pClientSock->GetAddr().strIp 

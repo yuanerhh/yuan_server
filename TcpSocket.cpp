@@ -31,7 +31,7 @@ CTcpSocket::~CTcpSocket()
 {
     try
     {
-        myLog;
+        // myLog << endl;
         Close();
     }
     catch(const CException& e)
@@ -82,7 +82,8 @@ ISocket::ptr CTcpSocket::Accept()
 {
     sockaddr_in addr;
     socklen_t addrLen;
-    memset(&addr, 0, sizeof(addr));
+    bzero(&addr, sizeof(addr));
+    bzero(&addrLen, sizeof(addrLen));
 
     auto ret = accept4(m_socket, (sockaddr *)&addr, &addrLen, SOCK_NONBLOCK);
     if (-1 == ret)
