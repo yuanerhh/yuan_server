@@ -81,9 +81,8 @@ void CTcpSocket::Connect(const CNetAddr& stAddr)
 ISocket::ptr CTcpSocket::Accept()
 {
     sockaddr_in addr;
-    socklen_t addrLen;
+    socklen_t addrLen = sizeof(addr);
     bzero(&addr, sizeof(addr));
-    bzero(&addrLen, sizeof(addrLen));
 
     auto ret = accept4(m_socket, (sockaddr *)&addr, &addrLen, SOCK_NONBLOCK);
     if (-1 == ret)
