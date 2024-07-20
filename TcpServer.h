@@ -10,7 +10,7 @@ namespace yuan {
 class CTcpServer
 {
 public:
-    using ReadMsgCB = std::function<void(CConnector::ptr, char*, size_t)>;
+    using ReadMsgCB = std::function<void(CConnector::ptr, IBuffer*)>;
 
     CTcpServer(const std::string& strIp, std::int32_t nPort);
     ~CTcpServer();

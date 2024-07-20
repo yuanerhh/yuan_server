@@ -2,6 +2,7 @@
 #include <memory>
 #include <functional>
 #include "Channel.h"
+#include "IBuffer.h"
 
 namespace yuan {
 
@@ -11,7 +12,7 @@ class CConnector : public std::enable_shared_from_this<CConnector>
 {
 public:
     using ptr = std::shared_ptr<CConnector>;
-    using ReadMsgCB = std::function<void(CConnector::ptr, char*, size_t size)>;
+    using ReadMsgCB = std::function<void(CConnector::ptr, IBuffer*)>;
     using CloseCB = std::function<void(CConnector::ptr)>;
 
     CConnector(CEventLoop* pEventLoop, ISocket::ptr pSocket);
@@ -29,6 +30,7 @@ private:
     CChannel::ptr m_pChannel;
     ReadMsgCB m_cbReadMsg;
     CloseCB m_cbClose;
+    std::unique_ptr<IBuffer> m_inputBuf;
 };
 
 }

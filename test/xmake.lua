@@ -16,4 +16,5 @@ target("echo_server")
     "../EpollEvent.cpp",
     "../Acceptor.cpp",
     "../Connector.cpp",
-    "../TcpServer.cpp")
+    "../TcpServer.cpp",
+    "../RingBuffer.cpp")

@@ -4,6 +4,7 @@
 #include "TcpSocket.h"
 #include "Log.h"
 #include "Exception.h"
+#include "RingBuffer.h"
 
 using namespace std;
 
@@ -12,6 +13,7 @@ namespace yuan {
 CConnector::CConnector(CEventLoop* pEventLoop, ISocket::ptr pSocket)
     : m_pEventLoop(pEventLoop)
     , m_pSocket(pSocket)
+    , m_inputBuf(new CRingBuffer())
 {
     m_pChannel = make_shared<CChannel>(pEventLoop, pSocket, false);
     m_pChannel->SetReadStatus(true);
@@ -56,12 +58,12 @@ void CConnector::OnReadMsg()
                 }
                 break;
             }
-
+            
+            m_inputBuf->Write(buf, nRecvSize);
             if (m_cbReadMsg)
             {
-                m_cbReadMsg(shared_from_this(), buf, nRecvSize);
+                m_cbReadMsg(shared_from_this(), m_inputBuf.get());
             }
-            // m_pSocket->Send(buf, nRecvSize);
         }
 
     }

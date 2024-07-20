@@ -5,9 +5,10 @@
 using namespace std;
 using namespace yuan;
 
-void ReadMsgCB(CConnector::ptr pConn, char* pBuf, size_t size)
+void ReadMsgCB(CConnector::ptr pConn, IBuffer* pBuf)
 {
-    pConn->Send(pBuf, size);
+    auto data = pBuf->ReadAll();
+    pConn->Send(data.data(), data.size());
 }
 
 int main(int argc, char const *argv[])
