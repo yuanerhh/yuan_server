@@ -65,11 +65,11 @@ void CRingBuffer::Resize(size_t size)
     {
         m_writePos = m_writePos + m_capacity - size;
     }
-    
+
     m_capacity = size;
 }
 
-void CRingBuffer::Write(char* pData, size_t size)
+void CRingBuffer::Write(const char* pData, size_t size)
 {
     if (size > (Capacity() - DataSize()))
     {
@@ -90,6 +90,11 @@ void CRingBuffer::Write(char* pData, size_t size)
 
 IBuffer::DATA CRingBuffer::Read(size_t size)
 {
+    if (size > DataSize())
+    {
+        return ReadAll();
+    }
+
     if (m_readPos + size < m_capacity)
     {
         string strData(m_pData + m_readPos, size);
@@ -100,6 +105,8 @@ IBuffer::DATA CRingBuffer::Read(size_t size)
     string strData(m_pData + m_readPos, m_capacity - m_readPos);
     strData.append(m_pData, size - m_capacity + m_readPos);
     m_readPos = size - m_capacity + m_readPos;
+
+    return strData;
 }
 
 IBuffer::DATA CRingBuffer::ReadAll()
@@ -127,7 +134,8 @@ size_t CRingBuffer::__CalResize(size_t size)
 
     if (resize > MAX_BUF_SIZE)
     {
-        COutOfBoundThrow("resize is exceed max buf size: " + std::to_string(MAX_BUF_SIZE));
+        COutOfBoundThrow("resize: " + std::to_string(resize) + " is exceed max buf size : " 
+            + std::to_string(MAX_BUF_SIZE));
     }
 
     return resize;

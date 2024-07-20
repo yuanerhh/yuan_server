@@ -2,7 +2,6 @@
 #include <cstddef>
 #include <string>
 #include <cstring>
-#include <error.h>
 
 using ERROR_CODE = std::int32_t;
 

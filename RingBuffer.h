@@ -14,7 +14,7 @@ public:
     virtual size_t DataSize() override;
     virtual size_t Capacity() override;
     virtual void Resize(size_t size) override;
-    virtual void Write(char* pData, size_t size) override;
+    virtual void Write(const char* pData, size_t size) override;
     virtual DATA Read(size_t size) override;
     virtual DATA ReadAll() override;
 

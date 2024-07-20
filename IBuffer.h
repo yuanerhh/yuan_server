@@ -14,9 +14,9 @@ public:
     virtual size_t DataSize() = 0;
     virtual size_t Capacity() = 0;
     virtual void Resize(size_t size) = 0;
-    virtual void Write(char* pData, size_t size) = 0;
+    virtual void Write(const char* pData, size_t size) = 0;
     virtual DATA Read(size_t size) = 0;
     virtual DATA ReadAll() = 0;
-}
+};
 
 }
