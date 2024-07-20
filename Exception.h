@@ -48,6 +48,7 @@ namespace yuan {
     MAKE_EXCEPTION(CInvalidAccess)
     MAKE_EXCEPTION(CNotSupport)
     MAKE_EXCEPTION(CNetOptError)
+    MAKE_EXCEPTION(COutOfBound);
 
     #define CUnexpectedThrow(info) throw CUnexpected(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
     #define CInvalidParamThrow(info) throw CInvalidParam(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
@@ -55,6 +56,7 @@ namespace yuan {
     #define CInvalidAccessThrow(info) throw CInvalidAccess(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
     #define CNotSupportThrow(info) throw CNotSupport(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
     #define CNetOptErrorThrow(info) throw CNetOptError(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
+    #define COutOfBoundThrow(info) throw COutOfBound(__FILE__, std::to_string(__LINE__), __FUNCTION__, info)
 
 #undef MAKE_EXCEPTION
 
