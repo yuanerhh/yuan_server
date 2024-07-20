@@ -5,9 +5,9 @@
 using namespace std;
 using namespace yuan;
 
-void ReadMsgCB(ISocket::ptr pSocket, char* pBuf, size_t size)
+void ReadMsgCB(CConnector::ptr pConn, char* pBuf, size_t size)
 {
-    pSocket->Send(pBuf, size);
+    pConn->Send(pBuf, size);
 }
 
 int main(int argc, char const *argv[])

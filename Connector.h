@@ -11,7 +11,7 @@ class CConnector : public std::enable_shared_from_this<CConnector>
 {
 public:
     using ptr = std::shared_ptr<CConnector>;
-    using ReadMsgCB = std::function<void(ISocket::ptr, char*, size_t size)>;
+    using ReadMsgCB = std::function<void(CConnector::ptr, char*, size_t size)>;
     using CloseCB = std::function<void(CConnector::ptr)>;
 
     CConnector(CEventLoop* pEventLoop, ISocket::ptr pSocket);
@@ -21,6 +21,7 @@ public:
     void OnReadMsg();
     void SetReadMsgCB(ReadMsgCB funcCB);
     void SetCloseCB(CloseCB funcCB);
+    std::int32_t Send(const char* pBuf, size_t size);
 
 private:
     CEventLoop* m_pEventLoop;

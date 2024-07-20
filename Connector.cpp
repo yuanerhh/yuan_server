@@ -59,7 +59,7 @@ void CConnector::OnReadMsg()
 
             if (m_cbReadMsg)
             {
-                m_cbReadMsg(m_pSocket, buf, nRecvSize);
+                m_cbReadMsg(shared_from_this(), buf, nRecvSize);
             }
             // m_pSocket->Send(buf, nRecvSize);
         }
@@ -79,6 +79,11 @@ void CConnector::SetReadMsgCB(ReadMsgCB funcCB)
 void CConnector::SetCloseCB(CloseCB funcCB)
 {
     m_cbClose = funcCB;
+}
+
+std::int32_t CConnector::Send(const char* pBuf, size_t size)
+{
+    m_pSocket->Send(pBuf, size);
 }
 
 }

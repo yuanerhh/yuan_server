@@ -31,6 +31,7 @@ CTcpSocket::~CTcpSocket()
 {
     try
     {
+        myLog;
         Close();
     }
     catch(const CException& e)
