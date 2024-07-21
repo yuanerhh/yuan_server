@@ -20,6 +20,7 @@ public:
 
     ISocket::ptr GetSocket();
     void OnReadMsg();
+    void OnWriteMsg();
     void SetReadMsgCB(ReadMsgCB funcCB);
     void SetCloseCB(CloseCB funcCB);
     std::int32_t Send(const char* pBuf, size_t size);
@@ -31,6 +32,8 @@ private:
     ReadMsgCB m_cbReadMsg;
     CloseCB m_cbClose;
     std::unique_ptr<IBuffer> m_inputBuf;
+    std::unique_ptr<IBuffer> m_outBuf;
+    std::string m_strWriteData;
 };
 
 }

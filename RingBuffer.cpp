@@ -1,5 +1,7 @@
 #include "RingBuffer.h"
 #include "Exception.h"
+#include "Log.h"
+#include "scope_exit.h"
 
 using namespace std;
 
@@ -9,8 +11,8 @@ using namespace std;
 namespace yuan {
 
 CRingBuffer::CRingBuffer()
-    : m_pData(new char[1024]), m_capacity(DEFAULT_BUF_SIZE)
-    , m_readPos(0), m_writePos(0)
+    : m_pData(new char[DEFAULT_BUF_SIZE]), m_capacity(DEFAULT_BUF_SIZE)
+    , m_readPos(0), m_writePos(0), m_isFull(false)
 {}
 
 CRingBuffer::~CRingBuffer()
@@ -24,13 +26,23 @@ CRingBuffer::~CRingBuffer()
 
 size_t CRingBuffer::DataSize()
 {
-    if (m_writePos >= m_readPos)
+    if (m_writePos > m_readPos)
     {
         return m_writePos - m_readPos;
     }
-    else
+    
+    if (m_writePos < m_readPos)
     {
         return m_writePos + m_capacity - m_readPos;
+    }
+    
+    if (m_isFull)
+    {
+        return 0;
+    }
+    else
+    {
+        return m_capacity;
     }
 }
 
@@ -45,6 +57,11 @@ void CRingBuffer::Resize(size_t size)
     {
         COutOfBoundThrow("size is smaller than DataSize");
     }
+    
+    if (size == DataSize())
+    {
+        m_isFull = true;
+    }
 
     std::string dataTemp = ReadAll();
     delete[] m_pData;
@@ -57,9 +74,9 @@ void CRingBuffer::Resize(size_t size)
         return;
     }
 
-    if (m_writePos + m_capacity < size)
+    if (m_readPos + DataSize() < size)
     {
-        m_writePos += m_capacity;
+        m_writePos = m_readPos + DataSize();
     }
     else
     {
@@ -74,6 +91,24 @@ void CRingBuffer::Write(const char* pData, size_t size)
     if (size > (Capacity() - DataSize()))
     {
         Resize(__CalResize(size));
+    }
+
+    scope_exit _([this]() {
+        if (m_writePos == m_readPos)
+        {
+            m_isFull = true;
+        }
+        else
+        {
+            m_isFull = false;
+        }
+    });
+
+    if (m_writePos < m_readPos)
+    {
+        memcpy(m_pData + m_writePos, pData, size);
+        m_writePos += size;
+        return;
     }
 
     if (m_writePos + size < m_capacity)
@@ -95,6 +130,17 @@ IBuffer::DATA CRingBuffer::Read(size_t size)
         return ReadAll();
     }
 
+    scope_exit _([this]() {
+        if (m_writePos == m_readPos)
+        {
+            m_isFull = false;
+        }
+        else
+        {
+            m_isFull = true;
+        }
+    });
+
     if (m_readPos + size < m_capacity)
     {
         string strData(m_pData + m_readPos, size);
@@ -111,6 +157,7 @@ IBuffer::DATA CRingBuffer::Read(size_t size)
 
 IBuffer::DATA CRingBuffer::ReadAll()
 {
+    m_isFull = false;
     if (m_writePos >= m_readPos)
     {
         string strData(m_pData + m_readPos, m_writePos - m_readPos);

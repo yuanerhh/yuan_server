@@ -90,8 +90,17 @@ void CChannel::SetEdgeTrigger(bool bStatus)
 }
 
 void CChannel::HandleEvent(const EVENT_DATA& stData)
-{
-    
+{ 
+    if (stData.type & EVENT_OUT)
+    {
+        if (m_funWriteCB)
+        {
+            m_funWriteCB();
+        }
+    }
+
+    //必须最后处理EVENT_IN，其中包含close事件，会关闭connector，
+    //导致其他的事件处理异常，必须放到最后处理
     if (stData.type & EVENT_IN)
     {
         if (m_funReadCB)
@@ -99,9 +108,6 @@ void CChannel::HandleEvent(const EVENT_DATA& stData)
             m_funReadCB();
         }
     }
-
-    
-
 }
 
 

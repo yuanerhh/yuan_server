@@ -1,6 +1,7 @@
 #include <iostream>
 #include "TcpServer.h"
 #include "Exception.h"
+#include "Log.h"
 
 using namespace std;
 using namespace yuan;
@@ -8,6 +9,7 @@ using namespace yuan;
 void ReadMsgCB(CConnector::ptr pConn, IBuffer* pBuf)
 {
     auto data = pBuf->ReadAll();
+    myLog << "ReadMsgCB msg size: " << data.size() << endl;
     pConn->Send(data.data(), data.size());
 }
 

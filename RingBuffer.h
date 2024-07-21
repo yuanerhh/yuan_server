@@ -30,6 +30,7 @@ private:
     size_t m_capacity;
     std::uint32_t m_readPos;
     std::uint32_t m_writePos;
+    bool m_isFull;
 };
 
 }

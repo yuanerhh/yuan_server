@@ -35,7 +35,7 @@ void CEventLoop::Start()
 {
     while (true)
     {
-        auto evObjs = m_poller->WaitEvent(10000000);
+        auto evObjs = m_poller->WaitEvent(1000000);
         for (const auto& evObj: evObjs)
         {
             auto ch = __GetChBySocket(evObj.pSocket);

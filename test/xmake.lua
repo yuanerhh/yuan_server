@@ -5,7 +5,8 @@
 
 target("echo_server")
     set_targetdir("./bin")
-    add_cxflags("-g -ggdb -DDEBUG")
+    add_cxflags("-g -ggdb -DDEBUG -fsanitize=address")
+    add_ldflags("-fsanitize=address")
     add_includedirs("../")
     set_kind("binary")
     add_files("echo_server.cpp", 
