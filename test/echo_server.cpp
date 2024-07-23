@@ -9,7 +9,8 @@ using namespace yuan;
 void ReadMsgCB(CConnector::ptr pConn, IBuffer* pBuf)
 {
     auto data = pBuf->ReadAll();
-    myLog << "ReadMsgCB msg size: " << data.size() << endl;
+    myLog << "in buf capacity: " << pBuf->Capacity() << ", datasize: "
+                << pBuf->DataSize() << endl;
     pConn->Send(data.data(), data.size());
 }
 

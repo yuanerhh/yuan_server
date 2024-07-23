@@ -63,6 +63,8 @@ void CConnector::OnReadMsg()
             }
             
             m_inputBuf->Write(buf, nRecvSize);
+            myLog << "in buf capacity: " << m_inputBuf->Capacity() << ", datasize: "
+                << m_inputBuf->DataSize() << endl;
         }
 
         if (m_cbReadMsg)
@@ -83,6 +85,8 @@ void CConnector::OnWriteMsg()
     {
         //追加数据
         m_strWriteData.append(m_outBuf->ReadAll());
+        myLog << "out buf capacity: " << m_outBuf->Capacity() << ", datasize: "
+         << m_outBuf->DataSize() << endl;
     }
     auto size = m_pSocket->Send(m_strWriteData.data(), m_strWriteData.size());
     if (size >= m_strWriteData.size())
@@ -114,6 +118,8 @@ std::int32_t CConnector::Send(const char* pBuf, size_t size)
     try
     {
         m_outBuf->Write(pBuf, size);
+        myLog << "out buf capacity: " << m_outBuf->Capacity() << ", datasize: "
+         << m_outBuf->DataSize() << endl;
     }
     catch(const std::exception& e)
     {

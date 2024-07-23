@@ -38,11 +38,11 @@ size_t CRingBuffer::DataSize()
     
     if (m_isFull)
     {
-        return 0;
+        return m_capacity;
     }
     else
     {
-        return m_capacity;
+        return 0;
     }
 }
 
