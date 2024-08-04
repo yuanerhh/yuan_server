@@ -3,3 +3,9 @@
 **/build
 **/bin
 **/*.o
+**/CMake*
+**/cmake*
+**/*.a
+**/*.so
+**/echo_server
+**/Makefile
