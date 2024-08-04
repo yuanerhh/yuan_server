@@ -68,26 +68,18 @@ void CRingBuffer::Resize(size_t size)
     m_pData = new char[size];
     memcpy(m_pData, dataTemp.data(), dataTemp.size());
     
-    if (m_writePos >= m_readPos)
-    {
-        m_capacity = size;
-        return;
-    }
-
-    if (m_readPos + DataSize() < size)
-    {
-        m_writePos = m_readPos + DataSize();
-    }
-    else
-    {
-        m_writePos = m_writePos + m_capacity - size;
-    }
-
+    m_readPos = 0;
+    m_writePos = dataTemp.size();
     m_capacity = size;
 }
 
 void CRingBuffer::Write(const char* pData, size_t size)
 {
+    if (size == 0)
+    {
+        return;
+    }
+
     if (size > (Capacity() - DataSize()))
     {
         Resize(__CalResize(size));
@@ -97,10 +89,6 @@ void CRingBuffer::Write(const char* pData, size_t size)
         if (m_writePos == m_readPos)
         {
             m_isFull = true;
-        }
-        else
-        {
-            m_isFull = false;
         }
     });
 
@@ -125,7 +113,12 @@ void CRingBuffer::Write(const char* pData, size_t size)
 
 IBuffer::DATA CRingBuffer::Read(size_t size)
 {
-    if (size > DataSize())
+    if (size == 0)
+    {
+        return string();
+    }
+
+    if (size >= DataSize())
     {
         return ReadAll();
     }
@@ -134,10 +127,6 @@ IBuffer::DATA CRingBuffer::Read(size_t size)
         if (m_writePos == m_readPos)
         {
             m_isFull = false;
-        }
-        else
-        {
-            m_isFull = true;
         }
     });
 
@@ -157,18 +146,42 @@ IBuffer::DATA CRingBuffer::Read(size_t size)
 
 IBuffer::DATA CRingBuffer::ReadAll()
 {
-    m_isFull = false;
-    if (m_writePos >= m_readPos)
+    if (0 == DataSize())
+    {
+        return string();
+    }
+
+    scope_exit _([this]() {
+        m_isFull = false;
+    });
+
+    if (m_writePos > m_readPos)
     {
         string strData(m_pData + m_readPos, m_writePos - m_readPos);
         m_readPos = m_writePos;
         return strData;
     }
 
-    string strData(m_pData + m_readPos, m_capacity - m_readPos);
-    strData.append(m_pData, m_writePos);
-    m_readPos = m_writePos;
-    return strData;
+    if (m_writePos < m_readPos)
+    {
+        string strData(m_pData + m_readPos, m_capacity - m_readPos);
+        strData.append(m_pData, m_writePos);
+        m_readPos = m_writePos;
+        return strData;
+    }
+
+    //m_writePos == m_readPos
+    if (m_readPos == 0)
+    {
+        return string(m_pData, m_capacity);
+    }
+    else
+    {
+        string strData(m_pData + m_readPos, m_capacity - m_readPos);
+        strData.append(m_pData, m_writePos);
+        m_readPos = m_writePos;
+        return strData;
+    }
 }
 
 size_t CRingBuffer::__CalResize(size_t size)
