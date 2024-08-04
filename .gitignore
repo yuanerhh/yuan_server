@@ -3,7 +3,8 @@
 **/build
 **/bin
 **/*.o
-**/CMake*
+**/CMakeCache.txt
+**/CMakeFiles
 **/cmake*
 **/*.a
 **/*.so
