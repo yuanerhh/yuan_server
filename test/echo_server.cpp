@@ -2,6 +2,9 @@
 #include "TcpServer.h"
 #include "Exception.h"
 #include "Log.h"
+#define _GNU_SOURCE
+#include <unistd.h>
+#include <sys/syscall.h>
 
 using namespace std;
 using namespace yuan;
@@ -10,6 +13,9 @@ void ReadMsgCB(CConnector::ptr pConn, IBuffer* pBuf)
 {
     myLog << "in buf capacity: " << pBuf->Capacity() << ", datasize: "
                 << pBuf->DataSize() << endl;
+
+    myLog << "thread id: " << syscall(SYS_gettid) << endl;
+    
     auto data = pBuf->ReadAll();
     pConn->Send(data.data(), data.size());
 }

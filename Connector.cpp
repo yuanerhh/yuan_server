@@ -19,8 +19,8 @@ CConnector::CConnector(CEventLoop* pEventLoop, ISocket::ptr pSocket)
     m_pChannel = make_shared<CChannel>(pEventLoop, pSocket, false);
     m_pChannel->SetReadStatus(true);
     m_pChannel->SetEdgeTrigger(true);
-    m_pChannel->SetReadCB(std::bind(&CConnector::OnReadMsg, this));
-    m_pChannel->SetWriteCB(std::bind(&CConnector::OnWriteMsg, this));
+    m_pChannel->SetReadCB(std::bind(&CConnector::__OnReadMsg, this));
+    m_pChannel->SetWriteCB(std::bind(&CConnector::__OnWriteMsg, this));
     m_pEventLoop->AddChannel(m_pChannel);
 }
 
@@ -34,7 +34,36 @@ ISocket::ptr CConnector::GetSocket()
     return m_pSocket;
 }
 
-void CConnector::OnReadMsg()
+void CConnector::SetReadMsgCB(ReadMsgCB funcCB)
+{
+    m_cbReadMsg = funcCB;
+}
+
+void CConnector::SetCloseCB(CloseCB funcCB)
+{
+    m_cbClose = funcCB;
+}
+
+std::int32_t CConnector::Send(const char* pBuf, size_t size)
+{
+    try
+    {
+        m_outBuf->Write(pBuf, size);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    catch(const CException& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+    m_pChannel->SetWriteStatus(true);
+    __OnWriteMsg(); //主动进行一次发送
+}
+
+void CConnector::__OnReadMsg()
 {
     const int nBufSize = 1024;
     char buf[nBufSize] = {0};
@@ -77,7 +106,7 @@ void CConnector::OnReadMsg()
     }
 }
 
-void CConnector::OnWriteMsg()
+void CConnector::__OnWriteMsg()
 {
     if (m_outBuf->DataSize() > 0)
     {
@@ -97,35 +126,6 @@ void CConnector::OnWriteMsg()
         m_strWriteData = m_strWriteData.substr(size, m_strWriteData.size() - size);
         m_pChannel->SetWriteStatus(true);
     }
-}
-
-void CConnector::SetReadMsgCB(ReadMsgCB funcCB)
-{
-    m_cbReadMsg = funcCB;
-}
-
-void CConnector::SetCloseCB(CloseCB funcCB)
-{
-    m_cbClose = funcCB;
-}
-
-std::int32_t CConnector::Send(const char* pBuf, size_t size)
-{
-    try
-    {
-        m_outBuf->Write(pBuf, size);
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-    catch(const CException& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-    
-    m_pChannel->SetWriteStatus(true);
-    OnWriteMsg(); //主动进行一次发送
 }
 
 }

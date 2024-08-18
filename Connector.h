@@ -19,11 +19,13 @@ public:
     ~CConnector();
 
     ISocket::ptr GetSocket();
-    void OnReadMsg();
-    void OnWriteMsg();
     void SetReadMsgCB(ReadMsgCB funcCB);
     void SetCloseCB(CloseCB funcCB);
     std::int32_t Send(const char* pBuf, size_t size);
+
+private:
+    void __OnReadMsg();
+    void __OnWriteMsg();
 
 private:
     CEventLoop* m_pEventLoop;
