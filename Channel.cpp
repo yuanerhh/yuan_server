@@ -10,16 +10,16 @@ using namespace std;
 namespace yuan {
 
 CChannel::CChannel(CEventLoop* pEventLoop, ISocket::ptr pSocket, bool bIsListen)
-    : m_pEventLoop(pEventLoop), m_poller(nullptr)
-    , m_pSocket(pSocket), m_bIsListen(bIsListen)
+    : m_pEventLoop(pEventLoop)
+    , m_poller(pEventLoop->GetEventPoller().get())
+    , m_pSocket(pSocket)
+    , m_bIsListen(bIsListen)
 {
-    m_poller = pEventLoop->GetEventPoller().get();
+
 }
 
 CChannel::~CChannel()
 {
-    // myLog << "CChannel ptr" << hex << (void *)this << dec << ", socket ref: " << m_pSocket.use_count() << endl;
-
     //销毁channel前，需要清除socket绑定的事件以及socket的智能指针引用
     //m_pSocket的生命周期应与其绑定的CChannel对象一致
     m_poller->RemoveEvent(m_pSocket);
@@ -30,17 +30,17 @@ ISocket::ptr CChannel::GetSocket()
     return m_pSocket;
 }
 
-void CChannel::SetReadCB(FuncEventCB func)
+void CChannel::SetReadCB(const FuncEventCB& func)
 {
     m_funReadCB = func;
 }
 
-void CChannel::SetWriteCB(FuncEventCB func)
+void CChannel::SetWriteCB(const FuncEventCB& func)
 {
     m_funWriteCB = func;
 }
 
-void CChannel::SetCloseCB(FuncEventCB func)
+void CChannel::SetCloseCB(const FuncEventCB& func)
 {
     m_funCloseCB = func;
 }
@@ -71,9 +71,9 @@ void CChannel::SetWriteStatus(bool bStatus)
     m_poller->UpdateEvent(m_pSocket, m_eventType, nullptr);
 }   
 
-void CChannel::SetCloseStatus(bool bStatus)
+void CChannel::SetCloseStatus(bool)
 {
-
+    //TODO
 }
 
 void CChannel::SetEdgeTrigger(bool bStatus)

@@ -1,12 +1,13 @@
 #include <memory>
 #include <functional>
 #include "Channel.h"
+#include "Utils.h"
 
 namespace yuan {
 
 class CEventLoop;
 
-class CAcceptor
+class CAcceptor : public CNonCoybale
 {
 public:
     using ptr = std::shared_ptr<CAcceptor>;
@@ -16,7 +17,7 @@ public:
     ~CAcceptor();
 
     void OnConnection();
-    void SetConnectCB(ConnectCB funcCB);
+    void SetConnectCB(const ConnectCB& funcCB);
 
 private:
     CEventLoop* m_pEventLoop;

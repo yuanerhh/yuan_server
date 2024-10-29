@@ -28,9 +28,9 @@ public:
     CChannel(CEventLoop* pEventLoop, ISocket::ptr pSocket, bool bIsListen);
     ~CChannel();
     ISocket::ptr GetSocket();
-    void SetReadCB(FuncEventCB func);
-    void SetWriteCB(FuncEventCB func);
-    void SetCloseCB(FuncEventCB func);
+    void SetReadCB(const FuncEventCB& func);
+    void SetWriteCB(const FuncEventCB& func);
+    void SetCloseCB(const FuncEventCB& func);
     void SetReadStatus(bool bStatus);
     void SetWriteStatus(bool bStatus);
     void SetCloseStatus(bool bStatus);

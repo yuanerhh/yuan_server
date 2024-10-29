@@ -47,7 +47,7 @@ void CAcceptor::OnConnection()
     }
 }
 
-void CAcceptor::SetConnectCB(ConnectCB funcCB)
+void CAcceptor::SetConnectCB(const ConnectCB& funcCB)
 {
     m_cbConnect = funcCB;
 }

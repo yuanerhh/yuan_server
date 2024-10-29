@@ -4,7 +4,17 @@
 #include <errno.h>
 #include <cstdio>
 
-bool is_valid_fd(int fd) 
+class CNonCoybale 
+{
+protected:
+    CNonCoybale() = default;
+    ~CNonCoybale() = default;
+
+    CNonCoybale(const CNonCoybale&) = delete;
+    CNonCoybale& operator=(const CNonCoybale&) = delete;
+};
+
+inline bool is_valid_fd(int fd) 
 {
     return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
 }
